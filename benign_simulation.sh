@@ -9,7 +9,7 @@ cleanup() {
 trap cleanup INT TERM EXIT
 
 # Parameters
-SIMULATION_DURATION=300    # seconds
+SIMULATION_DURATION=2   # seconds
 CONFIG_DIR="./config"
 UERANSIM_BIN="./build/nr-ue"
 LOG_DIR="./ue_logs"
@@ -36,7 +36,7 @@ while true; do
     fi
 
     # Randomize burst size: 1–5 UEs
-    BURST_SIZE=$((1 + RANDOM % 5))
+    BURST_SIZE=$((1 + RANDOM % 3))
 
     # Update deployment counter BEFORE launching
     TOTAL_DEPLOYED=$((TOTAL_DEPLOYED + BURST_SIZE))
@@ -44,8 +44,8 @@ while true; do
     echo "Deploying $BURST_SIZE UE(s)... (elapsed time: ${ELAPSED_TIME}s) (total deployed so far: $TOTAL_DEPLOYED)"
 
     # Kill previous nr-ue process (important to avoid overload, hide messages)
-    sudo pkill -9 nr-ue >/dev/null 2>&1 || true
-    sleep 1
+    # sudo pkill -9 nr-ue >/dev/null 2>&1 || true
+    
 
     # Launch new burst cleanly
     sudo $UERANSIM_BIN -c "$CONFIG_DIR/ue1.yaml" -n "$BURST_SIZE" > "$LOG_DIR/burst_${ELAPSED_TIME}.log" 2>&1 &
@@ -54,7 +54,7 @@ while true; do
     UE_PID=$!   #Capture the PID of the background nr-ue process
 
     # Random sleep 2–5 seconds
-    SLEEP_TIME=$(awk -v min=2 -v max=5 'BEGIN{srand(); print min+rand()*(max-min)}')
+    SLEEP_TIME=$(awk -v min=0.05 -v max=1 'BEGIN{srand(); print min+rand()*(max-min)}')
     sleep $SLEEP_TIME
 
     # Check if script was killed during the sleep

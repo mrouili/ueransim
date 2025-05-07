@@ -16,9 +16,11 @@
 Logger::Logger(const std::string &name, const std::vector<std::shared_ptr<spdlog::sinks::sink>> &sinks)
 {
     logger = new spdlog::logger(name, std::begin(sinks), std::end(sinks));
+    logger->set_pattern("[%Y-%m-%d %H:%M:%S.%e] [%n] [%l] %v");
 
     logger->set_level(spdlog::level::debug);
     logger->flush_on(spdlog::level::warn);
+    
 }
 
 Logger::~Logger()
